@@ -9,12 +9,12 @@ class Hierarchie:
     Class for the implementation of the modified NPA's hierarchy.
     """
 
-    def __init__(self, game, operatorsPlayers):
+    def __init__(self, game, operatorsPlayers, level = 1):
         self.game = game
-
+        self.level = level
         # Creation of the list of monomials.
         self.operatorsPlayers = operatorsPlayers
-        self.monomeList = [list(s) for s in itertools.product(*operatorsPlayers)]
+        self.monomeList = [list(s) for s in itertools.product(*operatorsPlayers, repeat = level)]
         self.n = len(self.monomeList)
 
         # Dict for reducing the numbers of SDP variables.
@@ -145,6 +145,10 @@ class Hierarchie:
                 operator.append(flag * (p + 1) * 2)
             else:
                 operator.append(flag * (p * 2 + 1))
+
+        #Filler for higher hierarchy.
+        for _ in range(3*(self.level - 1)):
+            operator.append(0)
 
         def recursiveFunc(operator, coef):
             #The operator is in the matrix
