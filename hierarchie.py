@@ -18,12 +18,11 @@ class Hierarchie:
 
         if level == 2:
             for player in range(self.game.nbPlayers):
+                assert(self.game.nbPlayers == 3) # changer pour 5 joueurs
                 self.monomeList += [list(s) for s in itertools.product(operatorsPlayers[player], operatorsPlayers[player], [0])] # AA'
-                #self.monomeList += [list(s) for s in itertools.product(operatorsPlayers[player], [0], operatorsPlayers[player])] # AA'
-                #self.monomeList += [list(s) for s in itertools.product([0], operatorsPlayers[player], operatorsPlayers[player])] # AA'
 
         if level == 3:
-            self.monomeList = [list(s) for s in itertools.product(list(range(2 * self.game.nbPlayers + 1)), repeat=3)]
+            self.monomeList = [list(s) for s in itertools.product(list(range(2 * self.game.nbPlayers + 1)), repeat=self.game.nbPlayers)] #0....2*nbPlayer
 
         self.n = len(self.monomeList)
         print(self.n)
