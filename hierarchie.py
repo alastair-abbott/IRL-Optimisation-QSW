@@ -16,15 +16,17 @@ class Hierarchie:
         self.operatorsPlayers = operatorsPlayers
         self.monomeList = [list(s) for s in itertools.product(*operatorsPlayers)] # 1 + AB + AC + BC + ABC
 
-        if level >= 2:
+        if level == 2:
             for player in range(self.game.nbPlayers):
                 self.monomeList += [list(s) for s in itertools.product(operatorsPlayers[player], operatorsPlayers[player], [0])] # AA'
+                #self.monomeList += [list(s) for s in itertools.product(operatorsPlayers[player], [0], operatorsPlayers[player])] # AA'
+                #self.monomeList += [list(s) for s in itertools.product([0], operatorsPlayers[player], operatorsPlayers[player])] # AA'
 
-        if level >= 3:
-            for player in range(self.game.nbPlayers):
-                self.monomeList += [list(s) for s in itertools.product(operatorsPlayers[player], operatorsPlayers[player], operatorsPlayers[player])] # AA'A''
+        if level == 3:
+            self.monomeList = [list(s) for s in itertools.product(list(range(2 * self.game.nbPlayers + 1)), repeat=3)]
 
         self.n = len(self.monomeList)
+        print(self.n)
         # Dict for reducing the numbers of SDP variables.
         self.variableDict = {}
         self.variablePosition = {}
@@ -64,7 +66,6 @@ class Hierarchie:
                     variableId += 1
 
                 matrix[i][j] = self.variableDict[var]
-                print(var.value, self.variableDict[var])
 
         return matrix
 
