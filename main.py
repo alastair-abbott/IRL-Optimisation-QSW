@@ -18,11 +18,11 @@ v1 = cp.Parameter()
 
 game = Game(nbPlayers, v0, v1, sym=False) #To solve the 5 player version, change nbPlayers and P3 to P5
 
-prob = Hierarchie(game, P3, level = 2)
+prob = Hierarchie(game, P3, level=1)
 prob.setNashEqConstraints()
-v0.value = 2/3
+v0.value = 0.07
 v1.value = 1
-qsw = prob.optimize(verbose=True, warmStart=False, solver="SCS")
+qsw = prob.optimize(verbose=True, warmStart=False, solver="MOSEK")
 print("QSW = {}".format(qsw))
 
 
