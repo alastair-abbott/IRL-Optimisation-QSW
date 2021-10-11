@@ -1,3 +1,5 @@
+import copy
+import itertools
 from itertools import groupby
 
 def opToPlayer(op, operatorsPlayers):
@@ -6,6 +8,24 @@ def opToPlayer(op, operatorsPlayers):
     """
     assert(op != 0) #Id operator associated to every player.
     return (op - 1) // 2
+
+def simplify(monome, playersOperators):
+    canonic = []
+
+    operators = filter(lambda op: op != 0, monome)  # filter out identity
+    operators = sorted(operators, key=lambda op: opToPlayer(op,
+                                                            playersOperators))  # Sort without commuting operators of a same player
+
+    for k, g in groupby(operators):
+        # GroupBy because the operators are projectors, so op^2 = op
+        # if k so that 0 (which correspond to the Id operator) are ignore we put them at the end.
+        if k: canonic.append(k)
+
+    # Fill the end with 0 (Id operators)
+    while len(canonic) != len(monome):
+        canonic.append(0)
+
+    return canonic
 
 class CanonicMonome:
 
@@ -25,31 +45,17 @@ class CanonicMonome:
          self.value = self.op_i + self.op_j
 
         self.playersOperators = playersOperators #Operators associated to each player
-        self.cannonic = self.cannonicForm()
+        self.canonic = self.canonicForm()
 
-    def cannonicForm(self):
-        cannonic = []
-
-        operators = filter(lambda op: op!=0, self.value) #filter out identity
-        operators = sorted(operators, key=lambda op: opToPlayer(op, self.playersOperators)) #Sort without commuting operators of a same player
-
-        for k, g in groupby(operators):
-            #GroupBy because the operators are projectors, so op^2 = op
-            #if k so that 0 (which correspond to the Id operator) are ignore we put them at the end.
-            if k: cannonic.append(k)
-
-        #Fill the end with 0 (Id operators)
-        while len(cannonic) != len(self.value):
-            cannonic.append(0)
-
-        return cannonic
+    def canonicForm(self):
+        return min(simplify(self.value, self.playersOperators), simplify(list(reversed(self.value)), self.playersOperators))
 
     def __eq__(self, other):
         if not isinstance(other, CanonicMonome):
             return False
 
-        #Two operator are equal if they have the same cannonic form.
-        return other.cannonic == self.cannonic
+        #Two operator are equal if they have the same canonic form.
+        return other.canonic == self.canonic
 
     def __hash__(self):
-        return tuple(self.cannonic).__hash__()
+        return tuple(self.canonic).__hash__()

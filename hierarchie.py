@@ -1,8 +1,18 @@
 import cvxpy as cp
 import numpy as np
-from canonicOp import CanonicMonome
 
+from canonicOp import CanonicMonome, simplify
 import itertools
+
+def reduce_monome_list(monomeList, playersOperators):
+    print("Before simplify {} monomes: {}.".format(len(monomeList), monomeList))
+    monomeList = set(map(lambda x: tuple(simplify(x, playersOperators)), monomeList))
+    monomeList = list(map(lambda x: list(x), monomeList))
+    monomeList.sort()
+    print("after simplify {} monomes: {}".format(len(monomeList), monomeList))
+
+    return monomeList
+
 
 class Hierarchie:
     """
@@ -14,15 +24,19 @@ class Hierarchie:
         self.level = level
         # Creation of the list of monomials.
         self.operatorsPlayers = operatorsPlayers
-        self.monomeList = [list(s) for s in itertools.product(*operatorsPlayers)] # 1 + AB + AC + BC + ABC
+        monomeList = [list(s) for s in itertools.product(*operatorsPlayers)] # 1 + AB + AC + BC + ABC
+        self.monomeList = reduce_monome_list(monomeList, operatorsPlayers)
 
         if level == 2:
             for player in range(self.game.nbPlayers):
                 assert(self.game.nbPlayers == 3) # changer pour 5 joueurs
                 self.monomeList += [list(s) for s in itertools.product(operatorsPlayers[player], operatorsPlayers[player], [0])] # AA'
+            self.monomeList = reduce_monome_list(self.monomeList, operatorsPlayers)
 
         if level == 3:
-            self.monomeList = [list(s) for s in itertools.product(list(range(2 * self.game.nbPlayers + 1)), repeat=self.game.nbPlayers)] #0....2*nbPlayer
+            monomes = [list(s) for s in itertools.product(list(range(2 * self.game.nbPlayers + 1)), repeat=self.game.nbPlayers)] #0....2*nbPlayer
+            self.monomeList = reduce_monome_list(monomes, operatorsPlayers)
+
 
         self.n = len(self.monomeList)
         print(self.n)
@@ -49,7 +63,7 @@ class Hierarchie:
 
     def projectorConstraints(self):
         '''
-        Create the matrix filled with the cannonic representation of each element of the moment matrix.
+        Create the matrix filled with the canonic representation of each element of the moment matrix.
         '''
         matrix = np.zeros((self.n, self.n))
         variableId = 0
@@ -59,7 +73,7 @@ class Hierarchie:
                 var = CanonicMonome(self.monomeList, i, j, self.operatorsPlayers)
 
                 if var not in self.variableDict:
-                    # If no other element as the same cannonic representation has *var*, a new SDP variable will be created.
+                    # If no other element as the same canonic representation has *var*, a new SDP variable will be created.
                     self.variableDict[var] = variableId
                     self.variablePosition[variableId] = (i, j)
                     variableId += 1
@@ -81,7 +95,7 @@ class Hierarchie:
 
                 varId = matrix[line][column]
                 if varId not in variablesDict:
-                    # One variable for each cannonic element of the matrix of moments.
+                    # One variable for each canonic element of the matrix of moments.
                     variablesDict[varId] = cp.Variable()
 
                 variable[line][column] = variablesDict[varId]
@@ -155,9 +169,9 @@ class Hierarchie:
             else:
                 operator.append(flag * (p * 2 + 1))
 
-
         def recursiveFunc(operator, coef):
             #The operator is in the matrix
+            operator = simplify(operator, self.operatorsPlayers)
             if operator in self.monomeList:
                 vec[self.monomeList.index(operator)] = coef
 
