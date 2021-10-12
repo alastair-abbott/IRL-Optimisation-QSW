@@ -50,10 +50,10 @@ def graph(nbPlayers, sym, delta=0.01, start=0, end=2, seeSawRepeatLow=10, seeSaw
     print("GraphState & deviated strat & classical strat")
     QSW_GraphState = []
     SW_classical = []
-    QSW_dev = []
+    # QSW_dev = []
     xGraphState = []
     xClassical = []
-    xDev = []
+    # xDev = []
 
     for idx, v0 in enumerate(x):
         print("iteration {}".format(idx))
@@ -68,11 +68,11 @@ def graph(nbPlayers, sym, delta=0.01, start=0, end=2, seeSawRepeatLow=10, seeSaw
         print(bestClassicalStrategy(game))
         xClassical.append(game.v0.value)
 
-        # QSW for deviated strat
-        if quantumStrategies.devStratIsNashEq(game):
-            dev = quantumStrategies.QSW(game, quantumStrategies.optimalTheta(game))
-            xDev.append(v0)
-            QSW_dev.append(dev)
+        # # QSW for deviated strat
+        # if quantumStrategies.devStratIsNashEq(game):
+        #     dev = quantumStrategies.QSW(game, quantumStrategies.optimalTheta(game))
+        #     xDev.append(v0)
+        #     QSW_dev.append(dev)
 
     # try:
     #     QSW_NotNash = readFile('data/{}Players_{}Points_Sym{}_HierarchieNoNash.txt'.format(nbPlayers, points, sym))
@@ -239,7 +239,7 @@ def graph(nbPlayers, sym, delta=0.01, start=0, end=2, seeSawRepeatLow=10, seeSaw
     axs.plot(x/2, list(reversed(QSW_SeeSaw)), label="SeeSaw")
     # axs.plot(x, list(reversed(Winrate_SeeSaw)), label="Winrate Seesaw")
     axs.plot([v/2 for v in xClassical], SW_classical, label="SW best classical strat")
-    axs.plot([v/2 for v in xDev], QSW_dev, label="SW of deviated strat")
+    # axs.plot([v/2 for v in xDev], QSW_dev, label="SW of deviated strat")
 
     axs.set_title("Quantum social welfare")
     axs.set_xlabel("v0/(v0+v1)")
