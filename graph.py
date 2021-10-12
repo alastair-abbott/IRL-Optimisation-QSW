@@ -74,22 +74,22 @@ def graph(nbPlayers, sym, delta=0.01, start=0, end=2, seeSawRepeatLow=10, seeSaw
             xDev.append(v0)
             QSW_dev.append(dev)
 
-    try:
-        QSW_NotNash = readFile('data/{}Players_{}Points_Sym{}_HierarchieNoNash.txt'.format(nbPlayers, points, sym))
-        print("Chargement hierarchie sans contrainte de Nash")
+    # try:
+    #     QSW_NotNash = readFile('data/{}Players_{}Points_Sym{}_HierarchieNoNash.txt'.format(nbPlayers, points, sym))
+    #     print("Chargement hierarchie sans contrainte de Nash")
 
-    except:
-        print("Hierarchie Sans contrainte de Nash")
-        QSW_NotNash = []
-        for idx, v0 in enumerate(x):
-            print("iteration {}".format(idx))
-            paramV0.value = v0
-            qsw = prob.optimize(verbose=False, warmStart=True, solver="MOSEK")
-            QSW_NotNash.append(qsw)
+    # except:
+    #     print("Hierarchie Sans contrainte de Nash")
+    #     QSW_NotNash = []
+    #     for idx, v0 in enumerate(x):
+    #         print("iteration {}".format(idx))
+    #         paramV0.value = v0
+    #         qsw = prob.optimize(verbose=False, warmStart=True, solver="MOSEK")
+    #         QSW_NotNash.append(qsw)
 
-        with open('data/{}Players_{}Points_Sym{}_HierarchieNoNash.txt'.format(nbPlayers, points, sym), 'w') as f:
-            for item in QSW_NotNash:
-                f.write("%s\n" % item)
+    #     with open('data/{}Players_{}Points_Sym{}_HierarchieNoNash.txt'.format(nbPlayers, points, sym), 'w') as f:
+    #         for item in QSW_NotNash:
+    #             f.write("%s\n" % item)
 
     try:
         QSW_Nash = readFile('data/{}Players_{}Points_Sym{}_HierarchieNash.txt'.format(nbPlayers, points, sym))
@@ -235,7 +235,7 @@ def graph(nbPlayers, sym, delta=0.01, start=0, end=2, seeSawRepeatLow=10, seeSaw
 
     axs.plot([v/2 for v in xGraphState], QSW_GraphState, label="GraphState")
     axs.plot(x/2, QSW_Nash, label="HierarchieNash")
-    axs.plot(x/2, QSW_NotNash, label="HierarchieNotNash")
+    # axs.plot(x/2, QSW_NotNash, label="HierarchieNotNash")
     axs.plot(x/2, list(reversed(QSW_SeeSaw)), label="SeeSaw")
     # axs.plot(x, list(reversed(Winrate_SeeSaw)), label="Winrate Seesaw")
     axs.plot([v/2 for v in xClassical], SW_classical, label="SW best classical strat")
