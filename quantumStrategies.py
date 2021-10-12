@@ -119,16 +119,15 @@ def graphStateStrategy(game):
 
     socialWelfare = (game.v0.value + game.v1.value)/2
 
-    if payoutRatio >= 0 and payoutRatio <= 1: #TBC
-        if game.nbPlayers == 5:
-            if game.sym:
-                if payoutRatio >= 1/3:
-                    return socialWelfare
-            else:
-                if payoutRatio >= 1/2:
-                    return socialWelfare
+    if game.nbPlayers == 5:
+        if game.sym:
+            if payoutRatio >= 1/3 and payoutRatio <= 3:
+                return socialWelfare
         else:
-            return socialWelfare
+            if payoutRatio >= 1/2 and payoutRatio <= 2:
+                return socialWelfare
+    else:
+        return socialWelfare
 
     return None # If none of the case above is verified, the graph strat strategy is not a correlated equilibrium.
 
