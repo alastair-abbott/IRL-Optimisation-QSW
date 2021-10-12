@@ -141,7 +141,7 @@ def graphState(nbPlayers):
         graphStateVec = 1 / np.sqrt(2**3) * np.array([1, 1, 1, -1, 1, -1, -1, -1])
     elif nbPlayers == 5:
         graphStateVec = 1 / np.sqrt(2**5) * np.array([1, 1, 1, -1, 1, 1, -1, 1, 1, 1, 1, -1, -1, -1, 1, -1, 1, -1,
-                                                   1, 1, 1, -1, -1, -1, -1, 1, -1, -1, 1, -1, -1, 1])
+                                                   1, 1, 1, -1, -1, -1, -1, 1, -1, -1, 1, -1, -1, -1])
     return np.outer(graphStateVec, graphStateVec)
 
 def graphStatePOVMS(nbPlayers):
