@@ -27,7 +27,7 @@ def readFile(file):
     return data
 
 
-def graph(nbPlayers, sym, points, seeSawRepeatLow = 10, seeSawRepeatHigh = 3, treshold=0.4, dimension=2):
+def graph(nbPlayers, sym, delta=0.01, start=0, end=2, seeSawRepeatLow=10, seeSawRepeatHigh=3, treshold=0.4, dimension=2):
 
     operatorsP1 = [0, 1, 2]
     operatorsP2 = [0, 3, 4]
@@ -38,7 +38,8 @@ def graph(nbPlayers, sym, points, seeSawRepeatLow = 10, seeSawRepeatHigh = 3, tr
     P5 = [operatorsP1, operatorsP2, operatorsP3, operatorsP4, operatorsP5]
     if nbPlayers == 5: P = P5
     else: P = P3
-    x = np.linspace(0, 1, points)
+    points = int(np.round((end-start)/delta)) + 1
+    x = np.linspace(start, end, points)
 
     paramV0 = cp.Parameter()
     v1 = 2 - paramV0
@@ -249,14 +250,16 @@ def graph(nbPlayers, sym, points, seeSawRepeatLow = 10, seeSawRepeatHigh = 3, tr
     plt.show()
 
 if __name__ == '__main__':
-    nbPlayers = 3
+    nbPlayers = 5
     sym=False #Sym for 5 players
-    points = 100
+    delta = 0.01
+    start = 0
+    end = 2
     seeSawRepeatLow = 3
     seeSawRepeatHigh = 3
     treshold = 0.33
     dimension = 2 #Only change dimension used in seeSaw, not on the Hierarchie.
 
-    graph(nbPlayers, sym, points, seeSawRepeatLow, seeSawRepeatHigh, treshold, dimension=dimension)
+    graph(nbPlayers, sym, delta, start, end, seeSawRepeatLow, seeSawRepeatHigh, treshold, dimension=dimension)
 
 
