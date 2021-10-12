@@ -27,7 +27,7 @@ def readFile(file):
     return data
 
 
-def graph(nbPlayers, sym, points, seeSawRepeatLow = 10, seeSawRepeatHigh = 3, treshold=0.4, dimension=2):
+def graph(nbPlayers, sym, delta=0.01, start=0, end=2, seeSawRepeatLow=10, seeSawRepeatHigh=3, treshold=0.4, dimension=2):
 
     operatorsP1 = [0, 1, 2]
     operatorsP2 = [0, 3, 4]
@@ -38,7 +38,8 @@ def graph(nbPlayers, sym, points, seeSawRepeatLow = 10, seeSawRepeatHigh = 3, tr
     P5 = [operatorsP1, operatorsP2, operatorsP3, operatorsP4, operatorsP5]
     if nbPlayers == 5: P = P5
     else: P = P3
-    x = np.linspace(0, 1, points)
+    points = int(np.round((end-start)/delta)) + 1
+    x = np.linspace(start, end, points)
 
     paramV0 = cp.Parameter()
     v1 = 2 - paramV0
@@ -49,10 +50,10 @@ def graph(nbPlayers, sym, points, seeSawRepeatLow = 10, seeSawRepeatHigh = 3, tr
     print("GraphState & deviated strat & classical strat")
     QSW_GraphState = []
     SW_classical = []
-    QSW_dev = []
+    # QSW_dev = []
     xGraphState = []
     xClassical = []
-    xDev = []
+    # xDev = []
 
     for idx, v0 in enumerate(x):
         print("iteration {}".format(idx))
@@ -67,28 +68,28 @@ def graph(nbPlayers, sym, points, seeSawRepeatLow = 10, seeSawRepeatHigh = 3, tr
         print(bestClassicalStrategy(game))
         xClassical.append(game.v0.value)
 
-        # QSW for deviated strat
-        if quantumStrategies.devStratIsNashEq(game):
-            dev = quantumStrategies.QSW(game, quantumStrategies.optimalTheta(game))
-            xDev.append(v0)
-            QSW_dev.append(dev)
+        # # QSW for deviated strat
+        # if quantumStrategies.devStratIsNashEq(game):
+        #     dev = quantumStrategies.QSW(game, quantumStrategies.optimalTheta(game))
+        #     xDev.append(v0)
+        #     QSW_dev.append(dev)
 
-    try:
-        QSW_NotNash = readFile('data/{}Players_{}Points_Sym{}_HierarchieNoNash.txt'.format(nbPlayers, points, sym))
-        print("Chargement hierarchie sans contrainte de Nash")
+    # try:
+    #     QSW_NotNash = readFile('data/{}Players_{}Points_Sym{}_HierarchieNoNash.txt'.format(nbPlayers, points, sym))
+    #     print("Chargement hierarchie sans contrainte de Nash")
 
-    except:
-        print("Hierarchie Sans contrainte de Nash")
-        QSW_NotNash = []
-        for idx, v0 in enumerate(x):
-            print("iteration {}".format(idx))
-            paramV0.value = v0
-            qsw = prob.optimize(verbose=False, warmStart=True, solver="MOSEK")
-            QSW_NotNash.append(qsw)
+    # except:
+    #     print("Hierarchie Sans contrainte de Nash")
+    #     QSW_NotNash = []
+    #     for idx, v0 in enumerate(x):
+    #         print("iteration {}".format(idx))
+    #         paramV0.value = v0
+    #         qsw = prob.optimize(verbose=False, warmStart=True, solver="MOSEK")
+    #         QSW_NotNash.append(qsw)
 
-        with open('data/{}Players_{}Points_Sym{}_HierarchieNoNash.txt'.format(nbPlayers, points, sym), 'w') as f:
-            for item in QSW_NotNash:
-                f.write("%s\n" % item)
+    #     with open('data/{}Players_{}Points_Sym{}_HierarchieNoNash.txt'.format(nbPlayers, points, sym), 'w') as f:
+    #         for item in QSW_NotNash:
+    #             f.write("%s\n" % item)
 
     try:
         QSW_Nash = readFile('data/{}Players_{}Points_Sym{}_HierarchieNash.txt'.format(nbPlayers, points, sym))
@@ -232,16 +233,16 @@ def graph(nbPlayers, sym, points, seeSawRepeatLow = 10, seeSawRepeatHigh = 3, tr
     fig, axs = plt.subplots(1, constrained_layout = True, figsize=(10, 10))
     fig.suptitle("Graph for {} players with {} points, sym: {}".format(nbPlayers, points, sym))
 
-    axs.plot([v/(2-v) for v in xGraphState], QSW_GraphState, label="GraphState")
-    axs.plot(x/(2-x), QSW_Nash, label="HierarchieNash")
-    axs.plot(x/(2-x), QSW_NotNash, label="HierarchieNotNash")
-    axs.plot(x/(2-x), list(reversed(QSW_SeeSaw)), label="SeeSaw")
+    axs.plot([v/2 for v in xGraphState], QSW_GraphState, label="GraphState")
+    axs.plot(x/2, QSW_Nash, label="HierarchieNash")
+    # axs.plot(x/2, QSW_NotNash, label="HierarchieNotNash")
+    axs.plot(x/2, list(reversed(QSW_SeeSaw)), label="SeeSaw")
     # axs.plot(x, list(reversed(Winrate_SeeSaw)), label="Winrate Seesaw")
-    axs.plot([v/(2-v) for v in xClassical], SW_classical, label="SW best classical strat")
-    axs.plot([v/(2-v) for v in xDev], QSW_dev, label="SW of deviated strat")
+    axs.plot([v/2 for v in xClassical], SW_classical, label="SW best classical strat")
+    # axs.plot([v/2 for v in xDev], QSW_dev, label="SW of deviated strat")
 
     axs.set_title("Quantum social welfare")
-    axs.set_xlabel("V0/V1")
+    axs.set_xlabel("v0/(v0+v1)")
     axs.set_ylabel("QSW")
     axs.set_ylim([0, 2])
     axs.legend(loc="upper right")
@@ -249,14 +250,16 @@ def graph(nbPlayers, sym, points, seeSawRepeatLow = 10, seeSawRepeatHigh = 3, tr
     plt.show()
 
 if __name__ == '__main__':
-    nbPlayers = 3
+    nbPlayers = 5
     sym=False #Sym for 5 players
-    points = 100
+    delta = 0.01
+    start = 0
+    end = 2
     seeSawRepeatLow = 3
     seeSawRepeatHigh = 3
     treshold = 0.33
     dimension = 2 #Only change dimension used in seeSaw, not on the Hierarchie.
 
-    graph(nbPlayers, sym, points, seeSawRepeatLow, seeSawRepeatHigh, treshold, dimension=dimension)
+    graph(nbPlayers, sym, delta, start, end, seeSawRepeatLow, seeSawRepeatHigh, treshold, dimension=dimension)
 
 
