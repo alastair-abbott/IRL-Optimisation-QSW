@@ -19,7 +19,7 @@ class Hierarchie:
     Class for the implementation of the modified NPA's hierarchy.
     """
 
-    def __init__(self, game, operatorsPlayers, level = 1):
+    def __init__(self, game, operatorsPlayers, level = 1, other_monomes=None):
         self.game = game
         self.level = level
         # Creation of the list of monomials.
@@ -36,6 +36,19 @@ class Hierarchie:
         if level == 3:
             monomes = [list(s) for s in itertools.product(list(range(2 * self.game.nbPlayers + 1)), repeat=self.game.nbPlayers)] #0....2*nbPlayer
             self.monomeList = reduce_monome_list(monomes, operatorsPlayers)
+
+        if level == 6:
+            #Add lvl 3 monomes
+            monomes = [list(s) for s in itertools.product(list(range(2 * self.game.nbPlayers + 1)), repeat=self.game.nbPlayers)] #0....2*nbPlayer
+
+            ops = itertools.chain(*zip(operatorsPlayers, operatorsPlayers)) # [ops1, ops1, ops2, ops2, ops3, ops3....] => AA'BB'CC'
+            monomes += [list(s) for s in itertools.product(*ops)]
+            self.monomeList = reduce_monome_list(monomes, operatorsPlayers)
+
+        if other_monomes != None:
+            assert(type(other_monomes) == list)
+            self.monomeList += other_monomes
+            self.monomeList = reduce_monome_list(self.monomeList, operatorsPlayers)
 
 
         self.n = len(self.monomeList)
