@@ -9,7 +9,10 @@ def opToPlayer(op, operatorsPlayers):
     assert(op != 0) #Id operator associated to every player.
     return (op - 1) // 2
 
-def simplify(monome, playersOperators):
+def simplify(monome, playersOperators, monomeSize=None):
+    if monomeSize == None:
+        monomeSize = len(monome)
+
     canonic = []
 
     operators = filter(lambda op: op != 0, monome)  # filter out identity
@@ -22,7 +25,7 @@ def simplify(monome, playersOperators):
         if k: canonic.append(k)
 
     # Fill the end with 0 (Id operators)
-    while len(canonic) != len(monome):
+    while len(canonic) < monomeSize:
         canonic.append(0)
 
     return canonic

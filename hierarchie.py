@@ -4,9 +4,9 @@ import numpy as np
 from canonicOp import CanonicMonome, simplify
 import itertools
 
-def reduce_monome_list(monomeList, playersOperators):
+def reduce_monome_list(monomeList, playersOperators, monomeSize=None):
     print("Before simplify {} monomes: {}.".format(len(monomeList), monomeList))
-    monomeList = set(map(lambda x: tuple(simplify(x, playersOperators)), monomeList))
+    monomeList = set(map(lambda x: tuple(simplify(x, playersOperators, monomeSize)), monomeList))
     monomeList = list(map(lambda x: list(x), monomeList))
     monomeList.sort()
     print("after simplify {} monomes: {}".format(len(monomeList), monomeList))
@@ -41,14 +41,16 @@ class Hierarchie:
             #Add lvl 3 monomes
             monomes = [list(s) for s in itertools.product(list(range(2 * self.game.nbPlayers + 1)), repeat=self.game.nbPlayers)] #0....2*nbPlayer
 
+            #Add lvl 6
             ops = itertools.chain(*zip(operatorsPlayers, operatorsPlayers)) # [ops1, ops1, ops2, ops2, ops3, ops3....] => AA'BB'CC'
             monomes += [list(s) for s in itertools.product(*ops)]
-            self.monomeList = reduce_monome_list(monomes, operatorsPlayers)
+            self.monomeList = reduce_monome_list(monomes, operatorsPlayers, monomeSize=6)
 
         if other_monomes != None:
             assert(type(other_monomes) == list)
+            size = max(map(lambda mon: len(mon), other_monomes))
             self.monomeList += other_monomes
-            self.monomeList = reduce_monome_list(self.monomeList, operatorsPlayers)
+            self.monomeList = reduce_monome_list(self.monomeList, operatorsPlayers, monomeSize=size)
 
 
         self.n = len(self.monomeList)
@@ -181,6 +183,10 @@ class Hierarchie:
                 operator.append(flag * (p + 1) * 2)
             else:
                 operator.append(flag * (p * 2 + 1))
+
+        op_size = len(self.monomeList[0])
+        while len(operator) != op_size:
+            operator.append(0)
 
         def recursiveFunc(operator, coef):
             #The operator is in the matrix
