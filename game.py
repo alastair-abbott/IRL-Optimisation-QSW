@@ -93,7 +93,7 @@ class Game:
         Return answers for which a switch on the player output gives a valid answer.
         """
         for answer in itertools.product(['0', '1'], repeat=self.nbPlayers):
-            answer2 = copy.deepcopy(list(answer))
+            answer2 = list(answer)
             answer2[player] = str(int(answer[player] == '0'))
             answer2 = "".join(answer2)
             if self.validAnswer(answer2, question):
