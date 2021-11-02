@@ -135,6 +135,7 @@ class Hierarchie:
             for type in ['0', '1']:
                 for noti in ['0', '1']:
                     payoutVecNot = []
+
                     for question in self.game.questions():
                         #Answers where the player doesn't defect from its advice
                         untouchedAnswers = lambda answer: question[playerId] != type or answer[playerId] != noti
@@ -157,7 +158,7 @@ class Hierarchie:
                             for validAnswer in filter(untouchedAnswers, self.game.validAnswerIt(question)):
                                 payoutVecNot.append(self.genVecPlayerPayoutWin(validAnswer, question, playerId))
 
-                            for validAnswer in filter(notAnswers, self.game.wrongAnswerIt(question)):
+                            for validAnswer in filter(notAnswers, self.game.wrongAnswerIt(question, playerId)):
                                 payoutVecNot.append(self.genVecPlayerNotPayoutWin(validAnswer, question, playerId))
 
                     payoutVecNot = self.game.questionDistribution * np.array(payoutVecNot).transpose()

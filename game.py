@@ -1,3 +1,4 @@
+import copy
 import itertools
 
 class Game:
@@ -57,13 +58,12 @@ class Game:
             return list(range(self.nbPlayers))
 
         playedType1 = question.index('1')
-        # Symmetric question, we must choose the correct player with type 1.
+        #Symmetric question, we must choose the correct player with type 1.
+        #Because it's v2, all player are involved
         if question.count("1") == 2:
-            if question[playedType1 + 2] != "1":
-                playedType1 += 3
+            return list(range(self.nbPlayers))
 
         involvedPlayers = [(playedType1 - 1) % self.nbPlayers, playedType1, (playedType1 + 1) % self.nbPlayers]
-
         return involvedPlayers
 
 
@@ -73,8 +73,14 @@ class Game:
             return sum([int(bit) for bit in answer]) % 2
 
         #Else, we check if the sum of invovled players is even
-        parity = sum([int(answer[idx]) for idx in self.involvedPlayers(question)]) % 2
-        return not parity
+        #parity = sum([int(answer[idx]) for idx in self.involvedPlayers(question)]) % 2
+        #return not parity
+
+        parity = 1
+        for i in range(self.nbPlayers):
+            if question[i] == "1":
+                parity = parity * ((1 + int(answer[(i-1) % self.nbPlayers]) + int(answer[i]) + int(answer[(i+1) % self.nbPlayers])) % 2)
+        return parity
 
     def validAnswerIt(self, question):
         for answer in itertools.product(['0', '1'], repeat=self.nbPlayers):
@@ -82,10 +88,15 @@ class Game:
             if self.validAnswer(answer, question):
                 yield answer
 
-    def wrongAnswerIt(self, question):
+    def wrongAnswerIt(self, question, player):
+        """
+        Return answers for which a switch on the player output gives a valid answer.
+        """
         for answer in itertools.product(['0', '1'], repeat=self.nbPlayers):
-            answer = "".join(answer)
-            if not self.validAnswer(answer, question):
+            answer2 = copy.deepcopy(list(answer))
+            answer2[player] = str(int(answer[player] == '0'))
+            answer2 = "".join(answer2)
+            if self.validAnswer(answer2, question):
                 yield answer
 
     def answerPayoutWin(self, answer):
